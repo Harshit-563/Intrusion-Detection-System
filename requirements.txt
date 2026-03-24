@@ -1,0 +1,6 @@
+pandas
+torch
+scikit-learn
+flwr
+flask
+numpy

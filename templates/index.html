@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intrusion Detection System</title>
+    <style>
+        :root {
+            --bg-top: #07111f;
+            --bg-bottom: #102b46;
+            --panel: rgba(8, 20, 34, 0.78);
+            --panel-border: rgba(145, 197, 255, 0.18);
+            --text: #e8f1fb;
+            --muted: #9db2c8;
+            --accent: #3dd9b4;
+            --accent-strong: #1ebf98;
+            --secondary: #17395d;
+            --input-bg: rgba(255, 255, 255, 0.06);
+            --input-border: rgba(255, 255, 255, 0.14);
+            --shadow: 0 24px 60px rgba(0, 0, 0, 0.32);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Segoe UI", "Trebuchet MS", sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            padding: 32px 20px 40px;
+            color: var(--text);
+            background:
+                radial-gradient(circle at top left, rgba(61, 217, 180, 0.2), transparent 28%),
+                radial-gradient(circle at top right, rgba(94, 167, 255, 0.22), transparent 30%),
+                linear-gradient(160deg, var(--bg-top), var(--bg-bottom));
+        }
+
+        .page {
+            max-width: 1220px;
+            margin: 0 auto;
+        }
+
+        .hero {
+            margin-bottom: 24px;
+            padding: 28px;
+            border: 1px solid var(--panel-border);
+            border-radius: 28px;
+            background: linear-gradient(145deg, rgba(15, 34, 56, 0.9), rgba(8, 20, 34, 0.88));
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(16px);
+        }
+
+        .eyebrow {
+            display: inline-block;
+            margin-bottom: 12px;
+            padding: 6px 12px;
+            border-radius: 999px;
+            background: rgba(61, 217, 180, 0.14);
+            color: #9df7e1;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        h2 {
+            margin: 0 0 10px;
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            line-height: 1.05;
+            letter-spacing: -0.04em;
+        }
+
+        .subtitle {
+            max-width: 760px;
+            margin: 0;
+            color: var(--muted);
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .panel {
+            border: 1px solid var(--panel-border);
+            border-radius: 28px;
+            background: var(--panel);
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(16px);
+            overflow: hidden;
+        }
+
+        .controls {
+            padding: 20px 24px 8px;
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .grid {
+            padding: 0 24px 24px;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.03);
+            transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+        }
+
+        .field:hover {
+            transform: translateY(-2px);
+            border-color: rgba(61, 217, 180, 0.25);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        label {
+            color: var(--muted);
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--input-border);
+            border-radius: 12px;
+            background: var(--input-bg);
+            color: var(--text);
+            font-size: 0.96rem;
+            outline: none;
+            transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+        }
+
+        input:focus {
+            border-color: rgba(61, 217, 180, 0.8);
+            box-shadow: 0 0 0 4px rgba(61, 217, 180, 0.16);
+            background: rgba(255, 255, 255, 0.09);
+        }
+
+        button {
+            border: 0;
+            border-radius: 14px;
+            padding: 12px 18px;
+            font-weight: 700;
+            letter-spacing: 0.01em;
+            cursor: pointer;
+            transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+        }
+
+        .ghost-button {
+            flex: 1 1 180px;
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .ghost-button:hover {
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22);
+        }
+
+        .predict-button {
+            width: calc(100% - 48px);
+            margin: 0 24px 24px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+            color: #06231b;
+            box-shadow: 0 18px 36px rgba(30, 191, 152, 0.26);
+        }
+
+        #result {
+            margin: 0 24px 24px;
+            min-height: 68px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            border: 1px solid rgba(61, 217, 180, 0.18);
+            border-radius: 18px;
+            background: linear-gradient(135deg, rgba(61, 217, 180, 0.12), rgba(94, 167, 255, 0.08));
+            color: #f5fbff;
+            text-align: center;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .form-intro {
+            padding: 0 24px 18px;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding-top: 20px;
+            }
+
+            .hero,
+            .panel {
+                border-radius: 22px;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            .predict-button,
+            #result,
+            .grid,
+            .form-intro,
+            .controls {
+                margin-left: 16px;
+                margin-right: 16px;
+                width: auto;
+                padding-left: 0;
+                padding-right: 0;
+            }
+
+            .controls,
+            .form-intro {
+                margin-left: 16px;
+                margin-right: 16px;
+            }
+
+            .grid {
+                padding: 0;
+            }
+
+            .predict-button {
+                margin-top: 0;
+                margin-bottom: 16px;
+            }
+
+            #result {
+                margin-bottom: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <section class="hero">
+            <span class="eyebrow">Federated Network Security</span>
+            <h2>Intrusion Detection System</h2>
+            <p class="subtitle">
+                Enter all 41 NSL-KDD features, load a sample pattern, and run a prediction from the trained detection model.
+            </p>
+        </section>
+
+        <form id="form" class="panel">
+            <div class="controls">
+                <div class="actions">
+                    <button class="ghost-button" type="button" onclick="fillSample('normal')">Fill Normal Data</button>
+                    <button class="ghost-button" type="button" onclick="fillSample('dos')">Fill DoS Data</button>
+                    <button class="ghost-button" type="button" onclick="fillSample('probe')">Fill Probe Data</button>
+                    <button class="ghost-button" type="button" onclick="fillSample('r2l')">Fill R2L Data</button>
+                    <button class="ghost-button" type="button" onclick="fillSample('u2r')">Fill U2R Data</button>
+                </div>
+            </div>
+
+            <p class="form-intro">
+                Each field maps to one model input. Numeric categorical values should match the encoded feature format used during training.
+            </p>
+
+            <div class="grid" id="inputs"></div>
+            <button class="predict-button" type="button" onclick="predict()">Predict Traffic Type</button>
+            <h3 id="result"></h3>
+        </form>
+    </div>
+
+    <script>
+        const columns = [
+            "duration", "protocol_type", "service", "flag", "src_bytes", "dst_bytes", "land",
+            "wrong_fragment", "urgent", "hot", "num_failed_logins", "logged_in",
+            "num_compromised", "root_shell", "su_attempted", "num_root",
+            "num_file_creations", "num_shells", "num_access_files", "num_outbound_cmds",
+            "is_host_login", "is_guest_login", "count", "srv_count", "serror_rate",
+            "srv_serror_rate", "rerror_rate", "srv_rerror_rate", "same_srv_rate",
+            "diff_srv_rate", "srv_diff_host_rate", "dst_host_count",
+            "dst_host_srv_count", "dst_host_same_srv_rate",
+            "dst_host_diff_srv_rate", "dst_host_same_src_port_rate",
+            "dst_host_srv_diff_host_rate", "dst_host_serror_rate",
+            "dst_host_srv_serror_rate", "dst_host_rerror_rate",
+            "dst_host_srv_rerror_rate"
+        ];
+
+        const sampleNormal = [
+            0, 0, 0, 0, 11, 5, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 9, 9, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 2, 9, 0.03,
+            0.17, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+        ];
+
+        const sampleDos = [
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 511, 511, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 255, 255, 1.0,
+            0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0
+        ];
+
+        const sampleProbe = [
+            0, 0, 181, 5450, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+        ];
+
+        const sampleR2L = [
+            0.0, 1.0, 20.0, 9.0, 334.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0,
+            0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 2.0, 2.0, 0.0, 0.0, 0.0, 0.0,
+            1.0, 0.0, 0.0, 2.0, 20.0, 1.0, 0.0, 1.0, 0.2, 0.0, 0.0, 0.0, 0.0
+        ];
+
+        const sampleU2R = [
+            0, 0, 0, 0,
+            0, 0,
+            0, 0, 0,
+            3,
+            0,
+            1,
+            2,
+            1,
+            1,
+            2,
+            2,
+            1,
+            1,
+            0,
+            0,
+            0,
+            5,
+            5,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0,
+            100,
+            50,
+            0.5,
+            0.5,
+            0.2,
+            0.2,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+        ];
+
+        const sampleSets = {
+            normal: sampleNormal,
+            dos: sampleDos,
+            probe: sampleProbe,
+            r2l: sampleR2L,
+            u2r: sampleU2R
+        };
+
+        const container = document.getElementById("inputs");
+        const resultEl = document.getElementById("result");
+
+        columns.forEach((col) => {
+            const div = document.createElement("div");
+            div.className = "field";
+            div.innerHTML = `
+                <label for="${col}">${col}</label>
+                <input type="number" step="any" id="${col}" value="0">
+            `;
+            container.appendChild(div);
+        });
+
+        function fillSample(type) {
+            const data = sampleSets[type] || sampleNormal;
+            columns.forEach((col, index) => {
+                document.getElementById(col).value = data[index];
+            });
+            resultEl.innerText = "";
+        }
+
+        async function predict() {
+            const features = columns.map((col) => Number(document.getElementById(col).value));
+
+            resultEl.innerText = "Predicting...";
+
+            try {
+                const response = await fetch("/predict", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ features })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    resultEl.innerText = data.error || "Prediction failed";
+                    return;
+                }
+
+                resultEl.innerText =
+                    `Prediction: ${data.label} | Confidence: ${data.confidence}% | ${data.status}`;
+            } catch (error) {
+                console.error("Prediction error:", error);
+                resultEl.innerText = "Error occurred while calling the prediction API";
+            }
+        }
+    </script>
+</body>
+</html>
